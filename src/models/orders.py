@@ -14,10 +14,12 @@ class OrdersORM(Base):
     manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"), index=True)
     region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"), index=True)
     total_price: Mapped[DECIMAL] = mapped_column(DECIMAL, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     product: Mapped["ProductsORM"] = relationship("ProductsORM")
     customer: Mapped["CustomersORM"] = relationship("CustomersORM")
     manager: Mapped["ManagersORM"] = relationship("ManagersORM")
     region: Mapped["RegionsORM"] = relationship("RegionsORM")
+    user: Mapped["UsersORM"] = relationship("UsersORM")
 
     __table_args__ = (
         Index("ix_orders_order_date", order_date),
@@ -26,4 +28,5 @@ class OrdersORM(Base):
         Index("ix_orders_manager_id", manager_id),
         Index("ix_orders_region_id", region_id),
         Index("ix_orders_total_price", total_price),
+        Index("ix_orders_user_id", user_id),
     )
