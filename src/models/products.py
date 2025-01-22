@@ -2,7 +2,7 @@ from sqlalchemy import String, ForeignKey, DECIMAL, Index, func
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
+from src.database import Base
 
 
 class ProductsORM(Base):

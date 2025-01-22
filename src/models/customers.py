@@ -1,7 +1,7 @@
 from sqlalchemy import String, Index, Date, func, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database import Base
+from src.database import Base
 
 
 class CustomersORM(Base):

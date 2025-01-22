@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
+from src.database import Base
 
 
 class ProductsWithServicesORM(Base):
