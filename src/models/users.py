@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
@@ -13,3 +13,9 @@ class UsersORM(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), index=True)
     email: Mapped[str] = mapped_column(String(200), unique=True, index=True)
     role: Mapped["RolesORM"] = relationship("RolesORM")
+
+    __table_args__ = (
+        Index("ix_users_username", username, unique=True),
+        Index("ix_users_email", email, unique=True),
+        Index("ix_users_role_id", role_id),
+    )
