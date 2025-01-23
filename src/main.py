@@ -11,12 +11,12 @@ from src.app.services import router as router_service
 app = FastAPI()
 
 
-@app.get('/')
+@app.get("/")
 def func():
     return {"message": "Welcome to the SHOP-STORE!"}
 
 
 app.include_router(router_service)
 
-if __name__ == '__main__':
-    uvicorn.run('main:app', reload=True)
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)
