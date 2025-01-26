@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, condecimal
+from pydantic import BaseModel, Field, condecimal, ConfigDict
 
 
 class ServicesAdd(BaseModel):
@@ -9,9 +9,10 @@ class ServicesAdd(BaseModel):
 class Services(ServicesAdd):
     id: int
 
-    class Config:
-        orm_mode = True
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
+
+    # class Config:
+    #     orm_mode = True
 
 
 class ServicesPatch(BaseModel):
