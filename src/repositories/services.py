@@ -1,8 +1,6 @@
-from sqlalchemy import insert
-
-from src.schemas.services import Services
-from src.models.services import ServicesORM
 from repositories.base import BaseRepository
+from src.models.services import ServicesORM
+from src.schemas.services import Services
 
 
 class ServicesRepository(BaseRepository):
