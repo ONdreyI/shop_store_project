@@ -2,9 +2,7 @@ import logging
 
 from fastapi import APIRouter, Body, HTTPException
 
-from src.database import async_session_maker
-from src.models import ServicesORM
-from src.repositories.services import ServicesRepository
+from src.app.dependencies import DBDep
 from src.schemas.services import ServicesAdd, ServicesPatch
 
 logging.basicConfig(level=logging.INFO)
@@ -16,25 +14,24 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех услуг")
-async def get_services():
-    async with async_session_maker() as session:
-        try:
-            return await ServicesRepository(session).get_all()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+async def get_services(db: DBDep):
+    try:
+        return await db.services.get_all()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/{service_id}", name="Получение одной услуги")
-async def get_service(service_id: int):
-    async with async_session_maker() as session:
-        try:
-            return await ServicesRepository(session).get_one_ore_none(id=service_id)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+async def get_service(service_id: int, db: DBDep):
+    try:
+        return await db.services.get_one_ore_none(id=service_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("", name="Добавление услуги")
 async def add_service(
+    db: DBDep,
     service: ServicesAdd = Body(
         openapi_examples={
             "1": {
@@ -45,52 +42,48 @@ async def add_service(
                 },
             }
         }
-    )
+    ),
 ):
-    async with async_session_maker() as session:
-        try:
-            await ServicesRepository(session).add(service)
-            await session.commit()
-            return {"status": "OK"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+    try:
+        await db.services.add(service)
+        await db.commit()
+        return {"status": "OK"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/{service_id}", name="Обновление услуги (полное)")
-async def update_service(service_id: int, service: ServicesAdd):
-    async with async_session_maker() as session:
-        db_service = await session.get(ServicesORM, service_id)
-        if db_service is None:
-            raise HTTPException(status_code=404, detail="Такой сервис не найден")
-        try:
-            await ServicesRepository(session).edit(service, id=service_id)
-            return {"status": "OK"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+async def update_service(service_id: int, service: ServicesAdd, db: DBDep):
+    check_status = await db.services.get_one_ore_none(id=service_id)
+    if check_status is None:
+        raise HTTPException(status_code=404, detail="Такой сервис не найден")
+    try:
+        await db.services.edit(service, id=service_id)
+        return {"status": "OK"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.patch("/{service_id}", name="Обновление услуги (частичное)")
-async def partial_update_service(service_id: int, service: ServicesPatch):
-    async with async_session_maker() as session:
-        db_service = await session.get(ServicesORM, service_id)
-        if db_service is None:
-            raise HTTPException(status_code=404, detail="Такой сервис не найден")
-        try:
-            await ServicesRepository(session).edit(
-                service,
-                exclude_unset=True,
-                id=service_id,
-            )
-            return {"status": "OK"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+async def partial_update_service(service_id: int, service: ServicesPatch, db: DBDep):
+    check_status = await db.services.get_one_ore_none(id=service_id)
+    if check_status is None:
+        raise HTTPException(status_code=404, detail="Такой сервис не найден")
+    try:
+        await db.services.edit(
+            service,
+            exclude_unset=True,
+            id=service_id,
+        )
+        return {"status": "OK"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{service_id}", name="Удаление услуги")
-async def delete_service(service_id: int):
-    async with async_session_maker() as session:
-        db_service = await session.get(ServicesORM, service_id)
-        if db_service is None:
-            raise HTTPException(status_code=404, detail="Такой сервис не найден")
-        await ServicesRepository(session).delete_one(id=service_id)
+async def delete_service(service_id: int, db: DBDep):
+    check_status = await db.services.get_one_ore_none(id=service_id)
+    if check_status is None:
+        raise HTTPException(status_code=404, detail="Такой сервис не найден")
+    await db.services.delete_one(id=service_id)
     return {"status": "OK", "details": "Сервис удален"}
