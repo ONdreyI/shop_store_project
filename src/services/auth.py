@@ -39,4 +39,4 @@ class AuthService:
                 token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
             )
         except jwt.exceptions.DecodeError:
-            raise HTTPException(status_code=401, detail="Неверный токе")
+            raise HTTPException(status_code=401, detail="Неверный токен")
