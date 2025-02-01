@@ -1,3 +1,5 @@
+from src.schemas.managers import Managers
+from src.models import ManagersORM
 from src.schemas.users import User
 from src.models import UsersORM
 from src.schemas.customers import Customers
@@ -27,3 +29,8 @@ class CustomersMapper(DataMapper):
 class UsersMapper(DataMapper):
     db_model = UsersORM
     schema = User
+
+
+class ManagersMapper(DataMapper):
+    db_model = ManagersORM
+    schema = Managers
