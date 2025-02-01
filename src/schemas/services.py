@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, condecimal, ConfigDict
+from pydantic import BaseModel, Field, condecimal
 
 
 class ServicesAdd(BaseModel):
