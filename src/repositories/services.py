@@ -1,8 +1,8 @@
-from repositories.base import BaseRepository
 from src.models.services import ServicesORM
-from src.schemas.services import Services
+from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import ServicesMapper
 
 
 class ServicesRepository(BaseRepository):
     model = ServicesORM
-    schema = Services
+    mapper = ServicesMapper

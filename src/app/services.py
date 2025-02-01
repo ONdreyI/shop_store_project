@@ -59,13 +59,19 @@ async def update_service(service_id: int, service: ServicesAdd, db: DBDep):
         raise HTTPException(status_code=404, detail="Такой сервис не найден")
     try:
         await db.services.edit(service, id=service_id)
+        await db.commit()
         return {"status": "OK"}
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.patch("/{service_id}", name="Обновление услуги (частичное)")
-async def partial_update_service(service_id: int, service: ServicesPatch, db: DBDep):
+async def partial_update_service(
+    service_id: int,
+    service: ServicesPatch,
+    db: DBDep,
+):
     check_status = await db.services.get_one_ore_none(id=service_id)
     if check_status is None:
         raise HTTPException(status_code=404, detail="Такой сервис не найден")
@@ -75,6 +81,7 @@ async def partial_update_service(service_id: int, service: ServicesPatch, db: DB
             exclude_unset=True,
             id=service_id,
         )
+        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -86,4 +93,5 @@ async def delete_service(service_id: int, db: DBDep):
     if check_status is None:
         raise HTTPException(status_code=404, detail="Такой сервис не найден")
     await db.services.delete_one(id=service_id)
+    await db.commit()
     return {"status": "OK", "details": "Сервис удален"}
