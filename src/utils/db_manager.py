@@ -1,3 +1,5 @@
+from src.repositories.customers import CustomersRepository
+from src.repositories.categories import CategoriesRepository
 from src.repositories.roles import RolesRepository
 from src.repositories.services import ServicesRepository
 from src.repositories.users import UsersRepository
@@ -14,6 +16,8 @@ class DBManager:
         self.services = ServicesRepository(self.session)
         self.users = UsersRepository(self.session)
         self.roles = RolesRepository(self.session)
+        self.categories = CategoriesRepository(self.session)
+        self.customers = CustomersRepository(self.session)
 
         return self
 
