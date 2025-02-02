@@ -1,3 +1,4 @@
+from src.repositories.regions import RegionsRepository
 from src.repositories.managers import ManagersRepository
 from src.repositories.customers import CustomersRepository
 from src.repositories.categories import CategoriesRepository
@@ -20,6 +21,7 @@ class DBManager:
         self.categories = CategoriesRepository(self.session)
         self.customers = CustomersRepository(self.session)
         self.managers = ManagersRepository(self.session)
+        self.regions = RegionsRepository(self.session)
 
         return self
 
