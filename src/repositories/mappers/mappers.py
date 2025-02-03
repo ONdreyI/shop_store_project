@@ -1,4 +1,4 @@
-from src.schemas.products import Products
+from src.schemas.products import Products, ProductWithCategoryResponse
 from src.models import ProductsORM
 from src.models import RegionsORM
 from src.schemas.regions import Regions
@@ -48,3 +48,8 @@ class RegionsMapper(DataMapper):
 class ProductsMapper(DataMapper):
     db_model = ProductsORM
     schema = Products
+
+
+class ProductWithCategoryMapper(DataMapper):
+    db_model = ProductsORM
+    schema = ProductWithCategoryResponse

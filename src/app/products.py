@@ -21,8 +21,11 @@ async def get_products(db: DBDep):
 
 @router.get("/{product_id}", name="Получение одного продукта")
 async def get_product(product_id: int, db: DBDep):
+    check_status = await db.products.get_one_ore_none(id=product_id)
+    if check_status is None:
+        raise HTTPException(status_code=404, detail="Такой продукт не найден")
     try:
-        return await db.products.get_one_ore_none(id=product_id)
+        return await db.products.get_products_with_categories(product_id=product_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
