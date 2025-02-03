@@ -1,3 +1,4 @@
+from src.repositories.products import ProductsRepository
 from src.repositories.regions import RegionsRepository
 from src.repositories.managers import ManagersRepository
 from src.repositories.customers import CustomersRepository
@@ -22,6 +23,7 @@ class DBManager:
         self.customers = CustomersRepository(self.session)
         self.managers = ManagersRepository(self.session)
         self.regions = RegionsRepository(self.session)
+        self.products = ProductsRepository(self.session)
 
         return self
 

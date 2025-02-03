@@ -1,3 +1,5 @@
+from src.schemas.products import Products
+from src.models import ProductsORM
 from src.models import RegionsORM
 from src.schemas.regions import Regions
 from src.schemas.managers import Managers
@@ -41,3 +43,8 @@ class ManagersMapper(DataMapper):
 class RegionsMapper(DataMapper):
     db_model = RegionsORM
     schema = Regions
+
+
+class ProductsMapper(DataMapper):
+    db_model = ProductsORM
+    schema = Products
