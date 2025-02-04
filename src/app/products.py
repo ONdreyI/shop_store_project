@@ -1,6 +1,6 @@
 import logging
 from fastapi import APIRouter, Body, HTTPException
-from src.app.dependencies import DBDep
+from src.app.dependencies import DBDep, PaginationParams
 from src.schemas.products import ProductsAdd, ProductsPatch
 
 logging.basicConfig(level=logging.INFO)
@@ -12,9 +12,16 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех продуктов")
-async def get_products(db: DBDep):
+async def get_products(
+        db: DBDep,
+        page: int = 1,
+        per_page: int = 10,
+):
     try:
-        return await db.products.get_all()
+        return await db.products.get_all_with_pagination(
+            page=page,
+            per_page=per_page,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -32,19 +39,19 @@ async def get_product(product_id: int, db: DBDep):
 
 @router.post("", name="Добавление продукта")
 async def add_product(
-    db: DBDep,
-    product: ProductsAdd = Body(
-        openapi_examples={
-            "1": {
-                "summary": "Новый продукт",
-                "value": {
-                    "name": "Новый продукт",
-                    "category_id": 1,
-                    "price": 999.99,
-                },
+        db: DBDep,
+        product: ProductsAdd = Body(
+            openapi_examples={
+                "1": {
+                    "summary": "Новый продукт",
+                    "value": {
+                        "name": "Новый продукт",
+                        "category_id": 1,
+                        "price": 999.99,
+                    },
+                }
             }
-        }
-    ),
+        ),
 ):
     try:
         await db.products.add(product)
@@ -69,9 +76,9 @@ async def update_product(product_id: int, product: ProductsAdd, db: DBDep):
 
 @router.patch("/{product_id}", name="Обновление продукта (частичное)")
 async def partial_update_product(
-    product_id: int,
-    product: ProductsPatch,
-    db: DBDep,
+        product_id: int,
+        product: ProductsPatch,
+        db: DBDep,
 ):
     check_status = await db.products.get_one_ore_none(id=product_id)
     if check_status is None:

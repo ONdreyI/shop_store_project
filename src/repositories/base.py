@@ -21,6 +21,19 @@ class BaseRepository:
             self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
         ]
 
+    async def get_all_with_pagination(
+        self,
+        page: int,
+        per_page: int,
+    ):
+        query = select(self.model)
+        offset = (page - 1) * per_page
+        query = query.limit(per_page).offset(offset)
+        result = await self.session.execute(query)
+        return [
+            self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
+        ]
+
     async def get_one_ore_none(self, **filter_by):
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)

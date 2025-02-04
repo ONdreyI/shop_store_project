@@ -1,10 +1,33 @@
 from typing import Annotated
 
-from fastapi import Request, HTTPException, Depends
+from fastapi import Request, HTTPException, Depends, Query
+from pydantic import BaseModel
 
 from src.database import async_session_maker
 from src.services.auth import AuthService
 from src.utils.db_manager import DBManager
+
+
+class PaginationParams(BaseModel):
+    page: Annotated[int, Query(1, ge=1)]
+    per_page: Annotated[int, Query(10, ge=1, lt=30)]
+
+
+def get_pagination_params(
+    page: Annotated[int, Query(1, ge=1)] = 1,
+    per_page: Annotated[int, Query(10, ge=1, lt=30)] = 10,
+) -> PaginationParams:
+    """
+    Get pagination parameters from request query parameters.
+    Default values are used if parameters are not provided.
+    :param page:
+    :param per_page:
+    :return:
+    """
+    return PaginationParams(page=page, per_page=per_page)
+
+
+PaginationDep = Annotated[PaginationParams, Depends(get_pagination_params)]
 
 
 def get_token(request: Request):

@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import select
 
 from src.models import CategoriesORM
@@ -38,3 +40,5 @@ class ProductsRepository(BaseRepository):
         # Преобразуем каждую строку в доменную сущность через маппер
         # return ProductWithCategoryResponse.model_validate(rows[0])
         return ProductWithCategoryMapper.map_to_domain_entity(rows[0])
+
+
