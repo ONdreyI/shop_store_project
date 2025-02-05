@@ -13,6 +13,20 @@ class BaseRepository:
     def __init__(self, session: async_session_maker):
         self.session = session
 
+    async def apply_pagination(self, query, page: int = 1, per_page: int = 10):
+        """
+        Попробовать реализовать единую пагинацию для всех методов и моделей.
+        Пока не использую нигде
+        :param query:
+        :param page:
+        :param per_page:
+        :return:
+        """
+        offset = (page - 1) * per_page
+        query = query.limit(per_page).offset(offset)
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
     async def get_all(self):
         query = select(self.model)
         result = await self.session.execute(query)
