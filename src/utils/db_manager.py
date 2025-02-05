@@ -1,3 +1,4 @@
+from src.repositories.products_with_services import ProductsWithServicesRepository
 from src.repositories.products import ProductsRepository
 from src.repositories.regions import RegionsRepository
 from src.repositories.managers import ManagersRepository
@@ -24,6 +25,7 @@ class DBManager:
         self.managers = ManagersRepository(self.session)
         self.regions = RegionsRepository(self.session)
         self.products = ProductsRepository(self.session)
+        self.products_with_services = ProductsWithServicesRepository(self.session)
 
         return self
 

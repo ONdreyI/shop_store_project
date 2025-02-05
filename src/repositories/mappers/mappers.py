@@ -1,3 +1,5 @@
+from src.schemas.products_with_services import ProductsWithServices
+from src.models import ProductsWithServicesORM
 from src.schemas.products import Products, ProductWithCategoryResponse
 from src.models import ProductsORM
 from src.models import RegionsORM
@@ -53,3 +55,8 @@ class ProductsMapper(DataMapper):
 class ProductWithCategoryMapper(DataMapper):
     db_model = ProductsORM
     schema = ProductWithCategoryResponse
+
+
+class ProductsWithServicesMapper(DataMapper):
+    db_model = ProductsWithServicesORM
+    schema = ProductsWithServices

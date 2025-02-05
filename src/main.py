@@ -13,6 +13,7 @@ from src.app.customers import router as router_customer
 from src.app.managers import router as router_manager
 from src.app.regions import router as router_region
 from src.app.products import router as router_product
+from src.app.products_with_services import router as router_product_with_services
 
 app = FastAPI()
 
@@ -26,6 +27,7 @@ app.include_router(router_auth)
 app.include_router(router_service)
 app.include_router(router_category)
 app.include_router(router_product)
+app.include_router(router_product_with_services)
 app.include_router(router_manager)
 app.include_router(router_region)
 app.include_router(router_customer)
