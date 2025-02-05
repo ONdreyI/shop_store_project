@@ -37,6 +37,28 @@ async def get_product(product_id: int, db: DBDep):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get(
+    "/{product_id}/category_id", name="Поиск всех продуктов по выбранной категории"
+)
+async def get_products_by_category_id(
+    db: DBDep,
+    category_id: int,
+    page: int = 1,
+    per_page: int = 5,
+):
+    check_status = await db.categories.get_one_ore_none(id=category_id)
+    if check_status is None:
+        raise HTTPException(status_code=404, detail="Такая категория не найдена")
+    try:
+        return await db.products.get_products_by_category(
+            category_id=category_id,
+            page=page,
+            per_page=per_page,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("", name="Добавление продукта")
 async def add_product(
     db: DBDep,
