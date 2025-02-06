@@ -45,8 +45,8 @@ class ProductsWithServicesRepository(BaseRepository):
         # Создаем объект ProductsWithServicesORM
         product_with_service = self.model(
             product_id=product_id,
-            service_ids=",".join(
-                map(str, service_ids)
+            service_ids=(
+                ",".join(map(str, service_ids)) if service_ids else None
             ),  # Хранение списка service_id в виде строки
             price=total_price,
         )
@@ -57,18 +57,22 @@ class ProductsWithServicesRepository(BaseRepository):
         await self.session.refresh(product_with_service)
 
         # Добавляем связи многие-ко-многим
-        for service_id in service_ids:
-            service_link = ProductsWithServicesServices(
-                product_with_service_id=product_with_service.id, service_id=service_id
-            )
-            self.session.add(service_link)
+        if service_ids:
+            for service_id in service_ids:
+                service_link = ProductsWithServicesServices(
+                    product_with_service_id=product_with_service.id,
+                    service_id=service_id,
+                )
+                self.session.add(service_link)
         await self.session.commit()
 
         # Возвращаем результат в нужном формате
         return {
             "product_id": product_with_service.product_id,
-            "service_ids": [
-                int(sid) for sid in product_with_service.service_ids.split(",")
-            ],
+            "service_ids": (
+                [int(sid) for sid in product_with_service.service_ids.split(",")]
+                if product_with_service.service_ids
+                else None
+            ),
             "price": product_with_service.price,
         }
