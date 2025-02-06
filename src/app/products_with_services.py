@@ -36,7 +36,7 @@ async def add_product_with_service(
                 "summary": "Продукт с сервисом",
                 "value": {
                     "product_id": 132,
-                    "service_id": 17,
+                    "service_ids": [16, 17],
                 },
             }
         }
@@ -45,7 +45,7 @@ async def add_product_with_service(
     try:
         await db.products_with_services.add_product_with_service(
             product_with_service.product_id,
-            product_with_service.service_id,
+            product_with_service.service_ids,
         )
         return {"status": "OK"}
     except Exception as e:
