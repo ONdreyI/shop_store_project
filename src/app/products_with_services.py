@@ -18,9 +18,16 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех продуктов с сервисами")
-async def get_all_products_with_services(db: DBDep):
+async def get_all_products_with_services(
+    db: DBDep,
+    page: int = 1,
+    per_page: int = 5,
+):
     try:
-        products_with_services = await db.products_with_services.get_all()
+        products_with_services = await db.products_with_services.get_all_pws(
+            page=page,
+            per_page=per_page,
+        )
         return products_with_services
     except Exception as e:
         logger.error(f"Ошибка при получении всех продуктов с сервисами: {e}")

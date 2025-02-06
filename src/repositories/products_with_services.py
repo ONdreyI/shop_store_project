@@ -76,3 +76,20 @@ class ProductsWithServicesRepository(BaseRepository):
             ),
             "price": product_with_service.price,
         }
+
+    async def get_all_pws(
+        self,
+        page: int,
+        per_page: int,
+    ) -> List[ProductsWithServices]:
+        query = select(self.model)
+        offset = (page - 1) * per_page
+        query = query.limit(per_page).offset(offset)
+        result = await self.session.execute(query)
+        products_with_services = []
+        for model in result.scalars().all():
+            # Преобразуем строку service_ids в список перед валидацией
+            if model.service_ids:
+                model.service_ids = [int(sid) for sid in model.service_ids.split(",")]
+            products_with_services.append(ProductsWithServices.from_orm(model))
+        return products_with_services
