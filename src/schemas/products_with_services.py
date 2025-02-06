@@ -1,12 +1,13 @@
 from decimal import Decimal
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class ProductsWithServicesAdd(BaseModel):
-    product_id: int
-    service_id: int
-    price: Decimal = Field(..., max_digits=10, decimal_places=2)
+    product_id: int = Field(..., description="ID продукта")
+    service_id: Optional[int] = Field(None, description="ID услуги (опционально)")
+    price: Decimal = Field(None, max_digits=10, decimal_places=2)
 
 
 class ProductsWithServices(ProductsWithServicesAdd):

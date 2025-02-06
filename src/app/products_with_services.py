@@ -35,17 +35,18 @@ async def add_product_with_service(
             "1": {
                 "summary": "Продукт с сервисом",
                 "value": {
-                    "product_id": 1,
-                    "service_id": 1,
-                    "price": 1999.99,
+                    "product_id": 132,
+                    "service_id": 17,
                 },
             }
         }
     ),
 ):
     try:
-        await db.products_with_services.add(product_with_service)
-        await db.commit()
+        await db.products_with_services.add_product_with_service(
+            product_with_service.product_id,
+            product_with_service.service_id,
+        )
         return {"status": "OK"}
     except Exception as e:
         logger.error(f"Ошибка при добавлении продукта с сервисом: {e}")
