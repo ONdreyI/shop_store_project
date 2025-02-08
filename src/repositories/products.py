@@ -74,3 +74,9 @@ class ProductsRepository(BaseRepository):
         products = result.mappings().all()
         print(f"products ка список словарей: {products}")
         return [ProductWithCategoryResponse(**product) for product in products]
+
+    async def get_product_price(self, product_id):
+        query = select(ProductsORM.price).where(ProductsORM.id == product_id)
+        result = await self.session.execute(query)
+        product_price = result.scalar()
+        return product_price
