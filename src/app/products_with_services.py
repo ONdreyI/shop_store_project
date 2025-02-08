@@ -62,16 +62,15 @@ async def add_product_with_service(
 
 @router.put("/{id}", name="Обновление продукта с сервисом (полное)")
 async def update_product_with_service(
-    pws_id: int, product_with_service: ProductsWithServicesAdd, db: DBDep
+    pws_id: int,
+    product_with_service: ProductsWithServicesAdd,
+    db: DBDep,
 ):
-    check_status = await db.products_with_services.get_one_ore_none(id=pws_id)
-    if check_status is None:
-        logger.error(f"Продукт с сервисом не найден, id: {pws_id}")
-        raise HTTPException(
-            status_code=404, detail="Такой продукт с сервисом не найден"
-        )
     try:
-        await db.products_with_services.edit_pws(product_with_service, id=pws_id)
+        await db.products_with_services.edit_pws(
+            data=product_with_service,
+            id=pws_id,
+        )
         return {"status": "OK"}
     except Exception as e:
         logger.error(f"Ошибка при обновлении продукта с сервисом: {e}")

@@ -2,7 +2,8 @@ from typing import List
 
 from sqlalchemy import select, delete, insert, update
 
-from repositories.base import BaseRepository
+from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import ProductsWithServicesMapper
 from src.models import ProductsORM
 from src.models import ServicesORM
 from src.models.products_with_services import (
@@ -17,7 +18,7 @@ from src.schemas.products_with_services import (
 
 class ProductsWithServicesRepository(BaseRepository):
     model = ProductsWithServicesORM
-    mapper = ProductsWithServices
+    mapper = ProductsWithServicesMapper
 
     async def add_product_with_service(self, product_id: int, service_ids: List[int]):
         # Получаем цену продукта
