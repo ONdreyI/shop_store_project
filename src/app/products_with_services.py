@@ -62,17 +62,16 @@ async def add_product_with_service(
 
 @router.put("/{id}", name="Обновление продукта с сервисом (полное)")
 async def update_product_with_service(
-    id: int, product_with_service: ProductsWithServicesAdd, db: DBDep
+    pws_id: int, product_with_service: ProductsWithServicesAdd, db: DBDep
 ):
-    check_status = await db.products_with_services.get_one_ore_none(id=id)
+    check_status = await db.products_with_services.get_one_ore_none(id=pws_id)
     if check_status is None:
-        logger.error(f"Продукт с сервисом не найден, id: {id}")
+        logger.error(f"Продукт с сервисом не найден, id: {pws_id}")
         raise HTTPException(
             status_code=404, detail="Такой продукт с сервисом не найден"
         )
     try:
-        await db.products_with_services.edit(product_with_service, id=id)
-        await db.commit()
+        await db.products_with_services.edit_pws(product_with_service, id=pws_id)
         return {"status": "OK"}
     except Exception as e:
         logger.error(f"Ошибка при обновлении продукта с сервисом: {e}")
@@ -81,21 +80,21 @@ async def update_product_with_service(
 
 @router.patch("/{id}", name="Обновление продукта с сервисом (частичное)")
 async def partial_update_product_with_service(
-    id: int,
+    pws_id: int,
     product_with_service: ProductsWithServicesPatch,
     db: DBDep,
 ):
-    check_status = await db.products_with_services.get_one_ore_none(id=id)
+    check_status = await db.products_with_services.get_one_ore_none(id=pws_id)
     if check_status is None:
-        logger.error(f"Продукт с сервисом не найден, id: {id}")
+        logger.error(f"Продукт с сервисом не найден, id: {pws_id}")
         raise HTTPException(
             status_code=404, detail="Такой продукт с сервисом не найден"
         )
     try:
-        await db.products_with_services.edit(
+        await db.products_with_services.edit_pws(
             product_with_service,
             exclude_unset=True,
-            id=id,
+            id=pws_id,
         )
         await db.commit()
         return {"status": "OK"}

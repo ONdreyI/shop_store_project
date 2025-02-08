@@ -23,6 +23,7 @@ class ProductsWithServicesORM(Base):
 class ProductsWithServicesServices(Base):
     __tablename__ = "products_with_services_services"
 
+    # id: Mapped[int] = mapped_column(primary_key=True)
     product_with_service_id: Mapped[int] = mapped_column(
         ForeignKey("products_with_services.id"), primary_key=True
     )

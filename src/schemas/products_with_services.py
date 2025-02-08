@@ -20,3 +20,13 @@ class ProductsWithServicesPatch(BaseModel):
     product_id: int | None = None
     service_id: int | None = None
     price: Decimal | None = Field(None, max_digits=10, decimal_places=2)
+
+
+class ProductsWithServicesServices(BaseModel):
+    services: List[int] = Field(..., description="Список ID услуг")
+    price: Decimal = Field(..., max_digits=10, decimal_places=2)
+
+
+class ProductsWithServicesServicesPatch(BaseModel):
+    services: List[int] = Field(None, description="Список ID услуг")
+    # price: Decimal = Field(None, max_digits=10, decimal_places=2)
