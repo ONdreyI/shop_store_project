@@ -83,15 +83,9 @@ async def partial_update_product_with_service(
     product_with_service: ProductsWithServicesPatch,
     db: DBDep,
 ):
-    check_status = await db.products_with_services.get_one_ore_none(id=pws_id)
-    if check_status is None:
-        logger.error(f"Продукт с сервисом не найден, id: {pws_id}")
-        raise HTTPException(
-            status_code=404, detail="Такой продукт с сервисом не найден"
-        )
     try:
         await db.products_with_services.edit_pws(
-            product_with_service,
+            data=product_with_service,
             exclude_unset=True,
             id=pws_id,
         )

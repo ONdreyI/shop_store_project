@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import List, Optional
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 
 
 class ProductsWithServicesAdd(BaseModel):
@@ -19,7 +19,12 @@ class ProductsWithServices(ProductsWithServicesAdd):
 class ProductsWithServicesPatch(BaseModel):
     product_id: Optional[int] = Field(None, description="ID продукта")
     service_ids: Optional[List[int]] = Field(None, description="Список ID услуг")
-    price: Optional[Decimal] = Field(None, max_digits=10, decimal_places=2)
+
+    @field_validator("service_ids", mode="before")
+    def parse_service_ids(cls, value):
+        if isinstance(value, str):
+            return [int(id.strip()) for id in value.split(",")]
+        return value
 
 
 class ProductsWithServicesServices(BaseModel):

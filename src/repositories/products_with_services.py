@@ -1,16 +1,16 @@
+from decimal import Decimal
 from typing import List
 
-from sqlalchemy import select, delete, insert, update
+from sqlalchemy import select, delete, insert
 
-from repositories.products import ProductsRepository
-from src.repositories.base import BaseRepository
-from src.repositories.mappers.mappers import ProductsWithServicesMapper
 from src.models import ProductsORM
 from src.models import ServicesORM
 from src.models.products_with_services import (
     ProductsWithServicesORM,
     ProductsWithServicesServices,
 )
+from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import ProductsWithServicesMapper
 from src.schemas.products_with_services import (
     ProductsWithServices,
     ProductsWithServicesPatch,
@@ -99,6 +99,15 @@ class ProductsWithServicesRepository(BaseRepository):
             products_with_services.append(ProductsWithServices.from_orm(model))
         return products_with_services
 
+    async def _get_services_prices(self, service_ids: list[int]) -> list[Decimal]:
+        """Получает цены услуг по списку их ID."""
+        if not service_ids:
+            return []
+
+        query = select(ServicesORM.price).where(ServicesORM.id.in_(service_ids))
+        result = await self.session.execute(query)
+        return result.scalars().all()
+
     async def edit_pws(
         self,
         data: ProductsWithServicesPatch,  # Используем вашу схему PATCH
@@ -106,74 +115,61 @@ class ProductsWithServicesRepository(BaseRepository):
         **filter_by,
     ) -> None:
         """
-        Обновляет запись в products_with_services и связанные сервисы.
+        Обновляет запись в products_with_services и связанные сервисы,
+        а также корректно пересчитывает итоговую цену.
         """
-        # Обновляем основные поля (product_id, price)
         update_data = data.model_dump(exclude_unset=exclude_unset)
-
-        # Получаем ID записиУдаляем service_ids из update_data, чтобы не обновлять его напрямую
         service_ids = update_data.pop("service_ids", None)
+        product_id = update_data.get("product_id")
 
-        # Обрабатываем сервисы, если они переданы
+        # Получаем текущую запись, чтобы использовать ее данные
+        pws = await self.get_one_ore_none(**filter_by)
+        if not pws:
+            raise ValueError("Запись не найдена")
+
+        # Если передан новый product_id, получаем его цену
+        if product_id:
+            product_query = select(ProductsORM.price).where(
+                ProductsORM.id == product_id
+            )
+            product_result = await self.session.execute(product_query)
+            product_price = product_result.scalar_one_or_none()
+            if product_price is None:
+                raise ValueError("Продукт не найден")
+        else:
+            product_price = pws.price - sum(
+                await self._get_services_prices(pws.service_ids)
+            )  # Оставляем старый product_price
+
+        # Если передан новый список service_ids, получаем их сумму цен
         if service_ids is not None:
-            # Получаем ID записи
-            pws = await self.get_one_ore_none(**filter_by)
-            if not pws:
-                raise ValueError("Запись не найдена")
+            services_price = sum(await self._get_services_prices(service_ids))
+        else:
+            services_price = sum(await self._get_services_prices(pws.service_ids))
 
-            # Получаем цену старого продукта
-            old_product_price = await ProductsRepository.get_product_price(
-                pws.product_id
+        # Вычисляем итоговую цену
+        total_price = product_price + services_price
+
+        # Обновляем основную таблицу
+        await self.edit(
+            data=ProductsWithServicesPatch(**update_data, price=total_price),
+            exclude_unset=exclude_unset,
+            **filter_by,
+        )
+
+        # Обновляем связи многие-ко-многим, если передан новый список service_ids
+        if service_ids is not None:
+            delete_stmt = delete(ProductsWithServicesServices).where(
+                ProductsWithServicesServices.product_with_service_id == pws.id
             )
+            await self.session.execute(delete_stmt)
 
-            # Вычитаем цену старого продукта из новой цены
-            new_price = update_data["price"] - old_product_price
+            if service_ids:
+                insert_values = [
+                    {"product_with_service_id": pws.id, "service_id": sid}
+                    for sid in service_ids
+                ]
+                insert_stmt = insert(ProductsWithServicesServices).values(insert_values)
+                await self.session.execute(insert_stmt)
 
-            # Получаем цену нового продукта
-            new_product_price = await ProductsRepository.get_product_price(
-                update_data["product_id"]
-            )
-
-            # Добавляем цену нового продукта к новой цене
-            final_price = new_price + new_product_price
-            update_data["price"] = final_price
-
-            # Обновляем основную таблицу
-            if update_data:
-                await self.edit(
-                    data=ProductsWithServicesPatch(**update_data),
-                    exclude_unset=exclude_unset,
-                    **filter_by,
-                )
-
-                # Обрабатываем сервисы, если они переданы
-                if service_ids is not None:
-                    # Удаляем старые связи
-                    delete_stmt = delete(ProductsWithServicesServices).where(
-                        ProductsWithServicesServices.product_with_service_id == pws.id
-                    )
-                    await self.session.execute(delete_stmt)
-
-                    # Добавляем новые связи
-                    if service_ids:
-                        insert_values = [
-                            {"product_with_service_id": pws.id, "service_id": sid}
-                            for sid in service_ids
-                        ]
-                        insert_stmt = insert(ProductsWithServicesServices).values(
-                            insert_values
-                        )
-                        await self.session.execute(insert_stmt)
-
-                    # Обновляем поле service_ids (если нужно хранить строку)
-                    await self.session.execute(
-                        update(ProductsWithServicesORM)
-                        .where(ProductsWithServicesORM.id == pws.id)
-                        .values(
-                            service_ids=(
-                                ",".join(map(str, service_ids)) if service_ids else None
-                            )
-                        )
-                    )
-
-                    await self.session.commit()
+        await self.session.commit()
