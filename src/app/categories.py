@@ -58,7 +58,6 @@ async def update_category(category_id: int, category: CategoriesAdd, db: DBDep):
         raise HTTPException(status_code=404, detail="Такая категория не найдена")
     try:
         await db.categories.edit(category, id=category_id)
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -79,7 +78,6 @@ async def partial_update_category(
             exclude_unset=True,
             id=category_id,
         )
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

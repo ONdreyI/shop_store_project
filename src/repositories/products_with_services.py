@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import List
 
 from sqlalchemy import select, delete, insert
@@ -13,7 +12,7 @@ from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import ProductsWithServicesMapper
 from src.schemas.products_with_services import (
     ProductsWithServices,
-    ProductsWithServicesPatch,
+    ProductsWithServicesAdd,
 )
 
 
@@ -21,7 +20,11 @@ class ProductsWithServicesRepository(BaseRepository):
     model = ProductsWithServicesORM
     mapper = ProductsWithServicesMapper
 
-    async def add_product_with_service(self, product_id: int, service_ids: List[int]):
+    async def add_product_with_service(
+            self,
+            product_id: int,
+            service_ids: List[int],
+    ):
         # Получаем цену продукта
         product_query = select(ProductsORM.price).where(ProductsORM.id == product_id)
         product_result = await self.session.execute(product_query)
@@ -50,9 +53,7 @@ class ProductsWithServicesRepository(BaseRepository):
         # Создаем объект ProductsWithServicesORM
         product_with_service = self.model(
             product_id=product_id,
-            service_ids=(
-                ",".join(map(str, service_ids)) if service_ids else None
-            ),  # Хранение списка service_id в виде строки
+            service_ids=service_ids,  # Хранение списка service_id в виде массива
             price=total_price,
         )
 
@@ -71,105 +72,80 @@ class ProductsWithServicesRepository(BaseRepository):
                 self.session.add(service_link)
         await self.session.commit()
 
-        # Возвращаем результат в нужном формате
-        return {
-            "product_id": product_with_service.product_id,
-            "service_ids": (
-                [int(sid) for sid in product_with_service.service_ids.split(",")]
-                if product_with_service.service_ids
-                else None
-            ),
-            "price": product_with_service.price,
-        }
-
-    async def get_all_pws(
-        self,
-        page: int,
-        per_page: int,
-    ) -> List[ProductsWithServices]:
-        query = select(self.model)
-        offset = (page - 1) * per_page
-        query = query.limit(per_page).offset(offset)
-        result = await self.session.execute(query)
-        products_with_services = []
-        for model in result.scalars().all():
-            # Преобразуем строку service_ids в список перед валидацией
-            if model.service_ids:
-                model.service_ids = [int(sid) for sid in model.service_ids.split(",")]
-            products_with_services.append(ProductsWithServices.from_orm(model))
-        return products_with_services
-
-    async def _get_services_prices(self, service_ids: list[int]) -> list[Decimal]:
-        """Получает цены услуг по списку их ID."""
-        if not service_ids:
-            return []
-
-        query = select(ServicesORM.price).where(ServicesORM.id.in_(service_ids))
-        result = await self.session.execute(query)
-        return result.scalars().all()
+        # Возвращаем результат в виде схемы Pydantic
+        return ProductsWithServices.model_validate(product_with_service)
 
     async def edit_pws(
-        self,
-        data: ProductsWithServicesPatch,  # Используем вашу схему PATCH
-        exclude_unset: bool = False,
-        **filter_by,
-    ) -> None:
+            self,
+            data: ProductsWithServicesAdd,
+            exclude_unset: bool = True,
+            **filter_by,
+    ):
         """
-        Обновляет запись в products_with_services и связанные сервисы,
-        а также корректно пересчитывает итоговую цену.
+        Создание нового метода для добавления или удаления сервисов
         """
-        update_data = data.model_dump(exclude_unset=exclude_unset)
-        service_ids = update_data.pop("service_ids", None)
-        product_id = update_data.get("product_id")
-
-        # Получаем текущую запись, чтобы использовать ее данные
+        # Получаем текущую запись
         pws = await self.get_one_ore_none(**filter_by)
+
         if not pws:
             raise ValueError("Запись не найдена")
 
-        # Если передан новый product_id, получаем его цену
-        if product_id:
-            product_query = select(ProductsORM.price).where(
-                ProductsORM.id == product_id
+        # Подготовка данных для обновления
+        update_data = data.model_dump(exclude_unset=exclude_unset)
+        service_ids = update_data.pop("service_ids", None)
+
+        # Определяет актуальные service_ids
+        final_service_ids = (
+            service_ids
+            if service_ids is not None
+            else (
+                [int(sid) for sid in pws.service_ids.split(",")]
+                if pws.service_ids
+                else []
             )
-            product_result = await self.session.execute(product_query)
-            product_price = product_result.scalar_one_or_none()
-            if product_price is None:
-                raise ValueError("Продукт не найден")
-        else:
-            product_price = pws.price - sum(
-                await self._get_services_prices(pws.service_ids)
-            )  # Оставляем старый product_price
+        )
 
-        # Если передан новый список service_ids, получаем их сумму цен
-        if service_ids is not None:
-            services_price = sum(await self._get_services_prices(service_ids))
-        else:
-            services_price = sum(await self._get_services_prices(pws.service_ids))
+        # Вычисляем сумму услуг
+        sum_services = 0
+        if final_service_ids:
+            stmt = select(ServicesORM.price).where(
+                ServicesORM.id.in_(final_service_ids)
+            )
+            result = await self.session.execute(stmt)
+            services_prices = result.scalars().all()
+            # if len(services_prices) != len(final_service_ids):
+            #     raise ValueError("Одна или несколько услуг не найдены")
+            sum_services = sum(services_prices)
 
-        # Вычисляем итоговую цену
-        total_price = product_price + services_price
+        # Получаем цену продукта
+        product_id = update_data.get("product_id")
+        product = await self.session.get(ProductsORM, product_id)
+        product_price = product.price
+
+        update_data["price"] = product_price + sum_services
+        update_data["service_ids"] = final_service_ids
 
         # Обновляем основную таблицу
         await self.edit(
-            data=ProductsWithServicesPatch(**update_data, price=total_price),
-            exclude_unset=exclude_unset,
+            data=ProductsWithServicesAdd(**update_data),
+            exclude_unset=True,
             **filter_by,
         )
-
-        # Обновляем связи многие-ко-многим, если передан новый список service_ids
+        # Обновляем связи многие-ко-многим
         if service_ids is not None:
-            delete_stmt = delete(ProductsWithServicesServices).where(
-                ProductsWithServicesServices.product_with_service_id == pws.id
+            await self.session.execute(
+                delete(ProductsWithServicesServices).where(
+                    ProductsWithServicesServices.product_with_service_id == pws.id
+                )
             )
-            await self.session.execute(delete_stmt)
-
-            if service_ids:
-                insert_values = [
-                    {"product_with_service_id": pws.id, "service_id": sid}
-                    for sid in service_ids
-                ]
-                insert_stmt = insert(ProductsWithServicesServices).values(insert_values)
-                await self.session.execute(insert_stmt)
+            if final_service_ids:
+                await self.session.execute(
+                    insert(ProductsWithServicesServices).values(
+                        [
+                            {"product_with_service_id": pws.id, "service_id": sid}
+                            for sid in final_service_ids
+                        ]
+                    )
+                )
 
         await self.session.commit()

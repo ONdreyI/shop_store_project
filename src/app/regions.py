@@ -79,7 +79,6 @@ async def partial_update_region(
             exclude_unset=True,
             id=region_id,
         )
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

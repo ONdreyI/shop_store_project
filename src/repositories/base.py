@@ -73,6 +73,7 @@ class BaseRepository:
             .values(**data.model_dump(exclude_unset=exclude_unset))
         )
         await self.session.execute(update_stmt)
+        await self.session.commit()
 
     async def delete_one(self, **filter_by) -> None:
         delete_stmt = delete(self.model).filter_by(**filter_by)

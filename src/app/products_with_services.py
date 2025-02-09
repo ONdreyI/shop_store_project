@@ -24,9 +24,11 @@ async def get_all_products_with_services(
     per_page: int = 5,
 ):
     try:
-        products_with_services = await db.products_with_services.get_all_pws(
-            page=page,
-            per_page=per_page,
+        products_with_services = (
+            await db.products_with_services.get_all_with_pagination(
+                page=page,
+                per_page=per_page,
+            )
         )
         return products_with_services
     except Exception as e:
@@ -60,45 +62,80 @@ async def add_product_with_service(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/{id}", name="Обновление продукта с сервисом (полное)")
-async def update_product_with_service(
-    pws_id: int,
-    product_with_service: ProductsWithServicesAdd,
+@router.get("/products", name="Проверка статуса")
+async def get_product_status(
     db: DBDep,
+    pws_id: int,
+    product_id: int,
 ):
     try:
-        await db.products_with_services.edit_pws(
-            data=product_with_service,
-            id=pws_id,
+        raise db.products_with_services.new_method(
+            pws_id=pws_id,
+            product_id=product_id,
         )
-        return {"status": "OK"}
     except Exception as e:
-        logger.error(f"Ошибка при обновлении продукта с сервисом: {e}")
+        logger.error(f"Ошибка при получении статуса продукта с сервисом: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/{id}", name="Обновление продукта с сервисом (частичное)")
-async def partial_update_product_with_service(
-    pws_id: int,
-    product_with_service: ProductsWithServicesPatch,
+@router.patch("/{id}", name="Удаление или добавление услуг")
+async def update_pws(
     db: DBDep,
+    pws_id: int,
+    pws_data: ProductsWithServicesPatch,
 ):
+    check_status = await db.products_with_services.get_one_ore_none(
+        id=pws_id,
+    )
+    if check_status is None:
+        logger.error(f"Продукт с сервисом не найден, id: {pws_id}")
+        raise HTTPException(
+            status_code=404, detail="Такой продукт с сервисом не найден"
+        )
     try:
         await db.products_with_services.edit_pws(
-            data=product_with_service,
-            exclude_unset=True,
+            data=pws_data,
             id=pws_id,
         )
-        await db.commit()
-        return {"status": "OK"}
+        return {"status": "OK", "data": pws_data}
     except Exception as e:
-        logger.error(f"Ошибка при частичном обновлении продукта с сервисом: {e}")
+        logger.error(
+            f"Ошибка при удалении или добавлении услуг продукта с сервисом: {e}"
+        )
         raise HTTPException(status_code=500, detail=str(e))
+
+
+#
+#
+# @router.patch("/{id}", name="Обновление продукта с сервисом (частичное)")
+# async def partial_update_product_with_service(
+#     pws_id: int,
+#     product_with_service: ProductsWithServicesPatch,
+#     db: DBDep,
+# ):
+#     try:
+#         await db.products_with_services.edit_pws(
+#             data=product_with_service,
+#             exclude_unset=True,
+#             id=pws_id,
+#         )
+#         await db.commit()
+#         return {"status": "OK"}
+#     except Exception as e:
+#         logger.error(f"Ошибка при частичном обновлении продукта с сервисом: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{id}", name="Удаление продукта с сервисом")
-async def delete_product_with_service(id: int, db: DBDep):
-    check_status = await db.products_with_services.get_one_ore_none(id=id)
+async def delete_product_with_service(
+    id: int,
+    product_id: int,
+    db: DBDep,
+):
+    check_status = await db.products_with_services.get_one_ore_none(
+        id=id,
+        product_id=product_id,
+    )
     if check_status is None:
         logger.error(f"Продукт с сервисом не найден, id: {id}")
         raise HTTPException(

@@ -20,12 +20,6 @@ class ProductsWithServicesPatch(BaseModel):
     product_id: Optional[int] = Field(None, description="ID продукта")
     service_ids: Optional[List[int]] = Field(None, description="Список ID услуг")
 
-    @field_validator("service_ids", mode="before")
-    def parse_service_ids(cls, value):
-        if isinstance(value, str):
-            return [int(id.strip()) for id in value.split(",")]
-        return value
-
 
 class ProductsWithServicesServices(BaseModel):
     product_with_service_id: int = Field(..., description="ID продукта с сервисом")

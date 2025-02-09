@@ -65,7 +65,6 @@ async def update_customer(customer_id: int, customer: CustomersAdd, db: DBDep):
         raise HTTPException(status_code=404, detail="Такой клиент не найден")
     try:
         await db.customers.edit(customer, id=customer_id)
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -86,7 +85,6 @@ async def partial_update_customer(
             exclude_unset=True,
             id=customer_id,
         )
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

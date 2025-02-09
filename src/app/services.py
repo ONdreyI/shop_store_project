@@ -59,7 +59,6 @@ async def update_service(service_id: int, service: ServicesAdd, db: DBDep):
         raise HTTPException(status_code=404, detail="Такой сервис не найден")
     try:
         await db.services.edit(service, id=service_id)
-        await db.commit()
         return {"status": "OK"}
 
     except Exception as e:
@@ -81,7 +80,6 @@ async def partial_update_service(
             exclude_unset=True,
             id=service_id,
         )
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

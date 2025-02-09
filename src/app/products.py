@@ -90,7 +90,6 @@ async def update_product(product_id: int, product: ProductsAdd, db: DBDep):
         raise HTTPException(status_code=404, detail="Такой продукт не найден")
     try:
         await db.products.edit(product, id=product_id)
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -111,7 +110,6 @@ async def partial_update_product(
             exclude_unset=True,
             id=product_id,
         )
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

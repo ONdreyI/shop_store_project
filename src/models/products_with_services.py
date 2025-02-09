@@ -1,21 +1,25 @@
-from sqlalchemy import ForeignKey, DECIMAL, String
+from sqlalchemy import ForeignKey, DECIMAL, Integer, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 from src.database import Base
 
 
 class ProductsWithServicesORM(Base):
     __tablename__ = "products_with_services"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), index=True)
-    service_ids: Mapped[str] = mapped_column(
-        String, nullable=True
-    )  # Хранение списка service_id в виде строки
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="CASCADE"), index=True
+    )
+    service_ids: Mapped[list[int]] = mapped_column(
+        ARRAY(Integer), nullable=True
+    )  # Используем массив
     price: Mapped[DECIMAL] = mapped_column(DECIMAL)
+
     product: Mapped["ProductsORM"] = relationship("ProductsORM")
     services: Mapped[list["ServicesORM"]] = relationship(
-        "ServicesORM", secondary="products_with_services_services"
+        "ServicesORM",
+        secondary="products_with_services_services",
+        cascade="all",
     )
 
 
@@ -23,8 +27,12 @@ class ProductsWithServicesORM(Base):
 class ProductsWithServicesServices(Base):
     __tablename__ = "products_with_services_services"
 
-    # id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True
+    )  # Добавлен первичный ключ
     product_with_service_id: Mapped[int] = mapped_column(
-        ForeignKey("products_with_services.id"), primary_key=True
+        ForeignKey("products_with_services.id", ondelete="CASCADE"), index=True
     )
-    service_id: Mapped[int] = mapped_column(ForeignKey("services.id"), primary_key=True)
+    service_id: Mapped[int] = mapped_column(
+        ForeignKey("services.id", ondelete="CASCADE"), index=True
+    )

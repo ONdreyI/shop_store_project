@@ -60,7 +60,6 @@ async def update_manager(manager_id: int, manager: ManagersAdd, db: DBDep):
         raise HTTPException(status_code=404, detail="Такой менеджер не найден")
     try:
         await db.managers.edit(manager, id=manager_id)
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -81,7 +80,6 @@ async def partial_update_manager(
             exclude_unset=True,
             id=manager_id,
         )
-        await db.commit()
         return {"status": "OK"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
