@@ -21,9 +21,9 @@ class ProductsWithServicesRepository(BaseRepository):
     mapper = ProductsWithServicesMapper
 
     async def add_product_with_service(
-            self,
-            product_id: int,
-            service_ids: List[int],
+        self,
+        product_id: int,
+        service_ids: List[int],
     ):
         # Получаем цену продукта
         product_query = select(ProductsORM.price).where(ProductsORM.id == product_id)
@@ -76,10 +76,10 @@ class ProductsWithServicesRepository(BaseRepository):
         return ProductsWithServices.model_validate(product_with_service)
 
     async def edit_pws(
-            self,
-            data: ProductsWithServicesAdd,
-            exclude_unset: bool = True,
-            **filter_by,
+        self,
+        data: ProductsWithServicesAdd,
+        exclude_unset: bool = True,
+        **filter_by,
     ):
         """
         Создание нового метода для добавления или удаления сервисов
