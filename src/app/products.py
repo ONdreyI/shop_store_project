@@ -1,6 +1,8 @@
 import logging
+
 from fastapi import APIRouter, Body, HTTPException
-from src.app.dependencies import DBDep, PaginationParams
+
+from src.app.dependencies import DBDep
 from src.schemas.products import ProductsAdd, ProductsPatch
 
 logging.basicConfig(level=logging.INFO)

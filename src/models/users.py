@@ -12,6 +12,7 @@ class UsersORM(Base):
     hashed_password: Mapped[str] = mapped_column(String(200))
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), index=True)
     email: Mapped[str] = mapped_column(String(200), unique=True, index=True)
+
     role: Mapped["RolesORM"] = relationship("RolesORM")
 
     __table_args__ = (

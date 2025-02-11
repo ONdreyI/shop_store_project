@@ -13,6 +13,7 @@ class ProductsORM(Base):
     name: Mapped[str] = mapped_column(String(200), index=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), index=True)
     price: Mapped[DECIMAL] = mapped_column(DECIMAL, index=True)
+
     category: Mapped["CategoriesORM"] = relationship("CategoriesORM")
 
     __table_args__ = (
