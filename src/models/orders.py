@@ -30,7 +30,7 @@ class OrdersORM(Base):
     region: Mapped["RegionsORM"] = relationship("RegionsORM")
     user: Mapped["UsersORM"] = relationship("UsersORM")
     product_with_services: Mapped["ProductsWithServicesORM"] = relationship(
-        "ProductsWithServicesORM", back_populates="order"
+        "ProductsWithServicesORM",
     )
 
     __table_args__ = (
