@@ -1,3 +1,5 @@
+from src.schemas.orders import Orders
+from src.models import OrdersORM
 from src.models import CategoriesORM
 from src.models import CustomersORM
 from src.models import ManagersORM
@@ -68,3 +70,8 @@ class ProductsWithServicesMapper(DataMapper):
 class ProductsWithServicesServicesSchemaMapper(DataMapper):
     db_model = ProductsWithServicesServices
     schema = ProductsWithServicesServices
+
+
+class OrdersMapper(DataMapper):
+    db_model = OrdersORM
+    schema = Orders

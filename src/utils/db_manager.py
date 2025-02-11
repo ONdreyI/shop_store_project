@@ -10,6 +10,7 @@ from src.repositories.categories import CategoriesRepository
 from src.repositories.roles import RolesRepository
 from src.repositories.services import ServicesRepository
 from src.repositories.users import UsersRepository
+from src.repositories.orders import OrdersRepository
 
 
 class DBManager:
@@ -32,6 +33,7 @@ class DBManager:
         self.products_with_services_services = ProductsWithServicesServicesRepository(
             self.session
         )
+        self.orders = OrdersRepository(self.session)
 
         return self
 
