@@ -15,3 +15,11 @@ class OrdersAdd(BaseModel):
 
 class Orders(OrdersAdd):
     id: int = Field(..., description="ID заказа")
+
+
+class OrdersAddRequest(BaseModel):
+    order_date: date = Field(..., description="Дата заказа")
+    customer_id: int = Field(..., description="ID клиента")
+    manager_id: int = Field(..., description="ID менеджера")
+    region_id: int = Field(..., description="ID региона")
+    product_with_services_id: int = Field(..., description="ID продукта с услугами")

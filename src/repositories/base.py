@@ -1,5 +1,7 @@
+from datetime import date
+
 from pydantic import BaseModel
-from sqlalchemy import select, delete, insert, update
+from sqlalchemy import select, delete, insert, update, and_
 
 from src.database import async_session_maker
 from src.repositories.mappers.base import DataMapper
@@ -31,6 +33,31 @@ class BaseRepository:
         query = select(self.model)
         result = await self.session.execute(query)
         # return [self.schema.model_validate(model) for model in result.scalars().all()]
+        return [
+            self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
+        ]
+
+    async def filter_by_time_with_pagination(
+        self,
+        start_date: date = None,
+        end_date: date = None,
+        page: int = 1,
+        per_page: int = 10,
+    ):
+        query = select(self.model)
+
+        if start_date and end_date:
+            query = query.where(
+                and_(
+                    self.model.order_date >= start_date,
+                    self.model.order_date <= end_date,
+                )
+            )
+
+        offset = (page - 1) * per_page
+        query = query.limit(per_page).offset(offset)
+
+        result = await self.session.execute(query)
         return [
             self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
         ]
