@@ -56,7 +56,11 @@ async def login_user(
     return {"access_token": access_token}
 
 
-@router.get("/me", name="Получение данных о пользователе")
+@router.get(
+    "/me",
+    name="Получение данных о пользователе",
+    description="Получение данных о пользователе",
+)
 async def only_auth(user_id: UserIdDep, db: DBDep):
     user = await db.users.get_one_ore_none(id=user_id)
     if not user:
