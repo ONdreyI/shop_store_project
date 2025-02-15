@@ -3,7 +3,6 @@ from .customers import CustomersORM
 from .managers import ManagersORM
 from .orders import OrdersORM
 from .products import ProductsORM
-from .products_with_services import ProductsWithServicesORM
 from .regions import RegionsORM
 from .roles import RolesORM
 from .services import ServicesORM
@@ -16,7 +15,6 @@ __all__ = [
     "ManagersORM",
     "OrdersORM",
     "ProductsORM",
-    "ProductsWithServicesORM",
     "RegionsORM",
     "RolesORM",
     "ServicesORM",

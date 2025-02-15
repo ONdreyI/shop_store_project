@@ -67,11 +67,6 @@ class ProductsWithServicesMapper(DataMapper):
     schema = ProductsWithServices
 
 
-class ProductsWithServicesServicesSchemaMapper(DataMapper):
-    db_model = ProductsWithServicesServices
-    schema = ProductsWithServicesServices
-
-
 class OrdersMapper(DataMapper):
     db_model = OrdersORM
     schema = Orders

@@ -1,5 +1,4 @@
-from sqlalchemy import String, ForeignKey, DECIMAL, Index, func, event
-from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy import String, ForeignKey, DECIMAL, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
@@ -15,6 +14,9 @@ class ProductsORM(Base):
     price: Mapped[DECIMAL] = mapped_column(DECIMAL, index=True)
 
     category: Mapped["CategoriesORM"] = relationship("CategoriesORM")
+    orders: Mapped[list["OrdersORM"]] = relationship(
+        "OrdersORM", secondary="order_products", back_populates="products"
+    )
 
     __table_args__ = (
         Index("ix_products_name", name),

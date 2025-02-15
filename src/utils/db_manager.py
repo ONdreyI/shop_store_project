@@ -30,9 +30,6 @@ class DBManager:
         self.regions = RegionsRepository(self.session)
         self.products = ProductsRepository(self.session)
         self.products_with_services = ProductsWithServicesRepository(self.session)
-        self.products_with_services_services = ProductsWithServicesServicesRepository(
-            self.session
-        )
         self.orders = OrdersRepository(self.session)
 
         return self
