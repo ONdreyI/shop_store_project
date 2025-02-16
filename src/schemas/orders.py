@@ -28,3 +28,18 @@ class OrdersAddRequest(BaseModel):
     region_id: int = Field(..., description="ID региона")
     product_ids: List[int] = Field(..., description="Список ID продуктов")
     service_ids: List[int] = Field(..., description="Список ID сервисов")
+
+
+class OrderUpdate(BaseModel):
+    add_product_ids: Optional[List[int]] = Field(
+        default=None, description="Список ID продуктов для добавления"
+    )
+    remove_product_ids: Optional[List[int]] = Field(
+        default=None, description="Список ID продуктов для удаления"
+    )
+    add_service_ids: Optional[List[int]] = Field(
+        default=None, description="Список ID сервисов для добавления"
+    )
+    remove_service_ids: Optional[List[int]] = Field(
+        default=None, description="Список ID сервисов для удаления"
+    )
