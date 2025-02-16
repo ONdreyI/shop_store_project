@@ -51,20 +51,32 @@ async def add_order(
                     "customer_id": 15,
                     "manager_id": 1,
                     "region_id": 2,
-                    "product_with_services_id": 23,
+                    "product_ids": [131, 132, 162],  # Список ID продуктов
+                    "service_ids": [16, 17, 25],  # Список ID сервисов
                 },
             }
         }
     ),
 ):
+    # Преобразуем данные запроса в схему OrdersAdd
     _order_data = OrdersAdd(
         user_id=user_id,
-        **order_data.dict(),
+        **order_data.dict(
+            exclude={"product_ids", "service_ids"}
+        ),  # Исключаем product_ids и service_ids
     )
 
     try:
-        await db.orders.add(_order_data)
-        await db.commit()
+        # Используем обновленный метод add для создания заказа
+        await db.orders.add_order(
+            data=_order_data,
+            product_ids=order_data.product_ids,  # Передаем список ID продуктов
+            service_ids=order_data.service_ids,  # Передаем список ID сервисов
+        )
         return {"status": "OK"}
+    except ValueError as e:
+        # Обработка ошибок, связанных с отсутствием продуктов или сервисов
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        # Обработка других ошибок
         raise HTTPException(status_code=500, detail=str(e))

@@ -11,16 +11,32 @@ class OrdersORM(Base):
     order_products = Table(
         "order_products",
         Base.metadata,
-        Column("order_id", ForeignKey("orders.id"), primary_key=True),
-        Column("product_id", ForeignKey("products.id"), primary_key=True),
+        Column(
+            "order_id",
+            ForeignKey("orders.id", ondelete="CASCADE"),
+            primary_key=True,
+        ),
+        Column(
+            "product_id",
+            ForeignKey("products.id", ondelete="CASCADE"),
+            primary_key=True,
+        ),
     )
 
     # Вспомогательная таблица для связи многие-ко-многим между ServicesORM и OrdersORM
     order_services = Table(
         "order_services",
         Base.metadata,
-        Column("order_id", ForeignKey("orders.id"), primary_key=True),
-        Column("service_id", ForeignKey("services.id"), primary_key=True),
+        Column(
+            "order_id",
+            ForeignKey("orders.id", ondelete="CASCADE"),
+            primary_key=True,
+        ),
+        Column(
+            "service_id",
+            ForeignKey("services.id", ondelete="CASCADE"),
+            primary_key=True,
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -37,17 +53,23 @@ class OrdersORM(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"), index=True, nullable=False
     )
-    total_price: Mapped[DECIMAL] = mapped_column(DECIMAL, index=True, nullable=False)
+    total_price: Mapped[DECIMAL] = mapped_column(DECIMAL, index=True, nullable=True)
 
     customer: Mapped["CustomersORM"] = relationship("CustomersORM")
     manager: Mapped["ManagersORM"] = relationship("ManagersORM")
     region: Mapped["RegionsORM"] = relationship("RegionsORM")
     user: Mapped["UsersORM"] = relationship("UsersORM")
     products: Mapped[list["ProductsORM"]] = relationship(
-        "ProductsORM", secondary=order_products, back_populates="orders"
+        "ProductsORM",
+        secondary=order_products,
+        back_populates="orders",
+        cascade="all",
     )
     services: Mapped[list["ServicesORM"]] = relationship(
-        "ServicesORM", secondary=order_services, back_populates="orders"
+        "ServicesORM",
+        secondary=order_services,
+        back_populates="orders",
+        cascade="all",
     )
 
     __table_args__ = (

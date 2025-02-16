@@ -1,16 +1,12 @@
-from repositories.products_with_services_services import (
-    ProductsWithServicesServicesRepository,
-)
-from src.repositories.products_with_services import ProductsWithServicesRepository
+from src.repositories.categories import CategoriesRepository
+from src.repositories.customers import CustomersRepository
+from src.repositories.managers import ManagersRepository
+from src.repositories.orders import OrdersRepository
 from src.repositories.products import ProductsRepository
 from src.repositories.regions import RegionsRepository
-from src.repositories.managers import ManagersRepository
-from src.repositories.customers import CustomersRepository
-from src.repositories.categories import CategoriesRepository
 from src.repositories.roles import RolesRepository
 from src.repositories.services import ServicesRepository
 from src.repositories.users import UsersRepository
-from src.repositories.orders import OrdersRepository
 
 
 class DBManager:
@@ -29,7 +25,6 @@ class DBManager:
         self.managers = ManagersRepository(self.session)
         self.regions = RegionsRepository(self.session)
         self.products = ProductsRepository(self.session)
-        self.products_with_services = ProductsWithServicesRepository(self.session)
         self.orders = OrdersRepository(self.session)
 
         return self

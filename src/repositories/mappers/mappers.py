@@ -4,7 +4,6 @@ from src.models import CategoriesORM
 from src.models import CustomersORM
 from src.models import ManagersORM
 from src.models import ProductsORM
-from src.models import ProductsWithServicesORM
 from src.models import RegionsORM
 from src.models import ServicesORM
 from src.models import UsersORM
@@ -60,11 +59,6 @@ class ProductsMapper(DataMapper):
 class ProductWithCategoryMapper(DataMapper):
     db_model = ProductsORM
     schema = ProductWithCategoryResponse
-
-
-class ProductsWithServicesMapper(DataMapper):
-    db_model = ProductsWithServicesORM
-    schema = ProductsWithServices
 
 
 class OrdersMapper(DataMapper):
