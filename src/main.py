@@ -14,6 +14,7 @@ from src.app.managers import router as router_manager
 from src.app.regions import router as router_region
 from src.app.products import router as router_product
 from src.app.orders import router as router_order
+from src.app.materialized_views import router as router_mv
 
 app = FastAPI()
 
@@ -31,6 +32,7 @@ app.include_router(router_manager)
 app.include_router(router_region)
 app.include_router(router_customer)
 app.include_router(router_order)
+app.include_router(router_mv)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", reload=True, host="localhost")

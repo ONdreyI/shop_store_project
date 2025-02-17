@@ -7,6 +7,7 @@ from .regions import RegionsORM
 from .roles import RolesORM
 from .services import ServicesORM
 from .users import UsersORM
+from .views.monthly_order_summary import MonthlyOrderSummaryORM
 
 
 __all__ = [
@@ -19,4 +20,5 @@ __all__ = [
     "RolesORM",
     "ServicesORM",
     "UsersORM",
+    "MonthlyOrderSummaryORM",
 ]

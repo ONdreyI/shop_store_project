@@ -1,3 +1,4 @@
+from src.repositories.views.monthly_order_summary import MonthlyOrderSummaryRepository
 from src.repositories.categories import CategoriesRepository
 from src.repositories.customers import CustomersRepository
 from src.repositories.managers import ManagersRepository
@@ -26,6 +27,7 @@ class DBManager:
         self.regions = RegionsRepository(self.session)
         self.products = ProductsRepository(self.session)
         self.orders = OrdersRepository(self.session)
+        self.monthly_order_summary = MonthlyOrderSummaryRepository(self.session)
 
         return self
 
