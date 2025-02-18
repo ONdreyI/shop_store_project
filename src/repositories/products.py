@@ -3,10 +3,11 @@ from typing import List
 from sqlalchemy import select
 
 from src.models import CategoriesORM
-from src.repositories.base import BaseRepository
-from src.schemas.products import ProductWithCategoryResponse
 from src.models import ProductsORM
+from src.repositories.base import BaseRepository
 from src.repositories.mappers.mappers import ProductsMapper, ProductWithCategoryMapper
+from src.schemas.products import ProductWithCategoryResponse
+from src.logging_config import logger
 
 
 class ProductsRepository(BaseRepository):
@@ -14,6 +15,8 @@ class ProductsRepository(BaseRepository):
     mapper = ProductsMapper
 
     async def get_products_with_categories(self, product_id):
+        logger.debug("Fetching product with ID: {product_id}")
+
         # Формируем запрос с объединением таблиц
         query = (
             select(
@@ -25,24 +28,26 @@ class ProductsRepository(BaseRepository):
             .join(CategoriesORM, self.model.category_id == CategoriesORM.id)
             .filter(ProductsORM.id == product_id)
         )
-        print(f"query: {query}")
+        logger.debug(f"Generated query: {query}")
 
-        # Выполняем запрос
-        result = await self.session.execute(query)
+        try:
+            # Выполняем запрос
+            result = await self.session.execute(query)
+            rows = result.mappings().all()
+            logger.debug(f"Query result: {rows}")
 
-        # Получаем все строки как список кортежей
-        rows = result.mappings().all()
-        print(rows)
+            if not rows:
+                logger.warning(f"No product found with ID: {product_id}")
+                return None
 
-        if not rows:
-            return None
+            # Преобразуем каждую строку в доменную сущность через маппер
+            mapped_result = ProductWithCategoryMapper.map_to_domain_entity(rows[0])
+            logger.debug(f"Mapped result: {mapped_result}")
+            return mapped_result
 
-        # Преобразуем каждую строку в доменную сущность через маппер
-        # return ProductWithCategoryResponse.model_validate(rows[0])
-        return ProductWithCategoryMapper.map_to_domain_entity(rows[0])
-
-    from sqlalchemy.future import select
-    from typing import List
+        except Exception as e:
+            logger.error(f"Error fetching product with ID {product_id}: {e}")
+            raise
 
     async def get_products_by_category(
         self, category_id: int, page: int = 1, per_page: int = 10
