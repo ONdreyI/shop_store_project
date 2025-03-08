@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Body, HTTPException
+from fastapi_cache.decorator import cache
 
 from src.app.dependencies import DBDep
 from src.schemas.regions import RegionsAdd, RegionsPatch
@@ -14,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех регионов")
+@cache(expire=3600)
 async def get_regions(db: DBDep):
     try:
         return await db.regions.get_all()
@@ -22,6 +24,7 @@ async def get_regions(db: DBDep):
 
 
 @router.get("/{region_id}", name="Получение одного региона")
+@cache(expire=3600)
 async def get_region(region_id: int, db: DBDep):
     try:
         return await db.regions.get_one_ore_none(id=region_id)

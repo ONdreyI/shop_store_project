@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Body, HTTPException
+from fastapi_cache.decorator import cache
 
 from src.app.dependencies import DBDep
 from src.schemas.products import ProductsAdd, ProductsPatch
@@ -14,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех продуктов")
+@cache(expire=3600)
 async def get_products(
     db: DBDep,
     page: int = 1,
@@ -29,6 +31,7 @@ async def get_products(
 
 
 @router.get("/{product_id}", name="Получение одного продукта")
+@cache(expire=3600)
 async def get_product(product_id: int, db: DBDep):
     check_status = await db.products.get_one_ore_none(id=product_id)
     if check_status is None:

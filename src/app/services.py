@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Body, HTTPException
+from fastapi_cache.decorator import cache
 
 from src.app.dependencies import DBDep
 from src.schemas.services import ServicesAdd, ServicesPatch
@@ -14,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех услуг")
+@cache(expire=3600)
 async def get_services(db: DBDep):
     try:
         return await db.services.get_all()
@@ -22,6 +24,7 @@ async def get_services(db: DBDep):
 
 
 @router.get("/{service_id}", name="Получение одной услуги")
+@cache(expire=3600)
 async def get_service(service_id: int, db: DBDep):
     try:
         return await db.services.get_one_ore_none(id=service_id)
