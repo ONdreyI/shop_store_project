@@ -1,4 +1,4 @@
-from repositories.base import BaseRepository
+from src.repositories.base import BaseRepository
 from src.models import ManagersORM
 from src.repositories.mappers.mappers import ManagersMapper
 

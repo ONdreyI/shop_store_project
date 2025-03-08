@@ -32,7 +32,7 @@ LOGGING_CONFIG = {
         },
         "console": {
             "class": "logging.StreamHandler",
-            "formatter": "simple",
+            "formatter": "detailed",  # simple
         },
     },
     "loggers": {

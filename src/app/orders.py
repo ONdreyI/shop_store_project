@@ -2,6 +2,7 @@ import logging
 from datetime import date
 
 from fastapi import APIRouter, HTTPException, Body, Query
+from fastapi_cache.decorator import cache
 from src.app.dependencies import DBDep, UserIdDep
 from src.schemas.orders import Orders, OrdersAdd, OrdersAddRequest, OrderUpdate
 
@@ -14,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех заказов")
+@cache(expire=3600)
 async def get_orders(
     db: DBDep,
     start_date: date | None = Query(None, example="2023-01-01"),
@@ -39,6 +41,7 @@ async def get_orders(
 
 
 @router.get("/{order_id}", name="Получение заказа")
+@cache(expire=3600)
 async def get_order(
     order_id: int,
     db: DBDep,

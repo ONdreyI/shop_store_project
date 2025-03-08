@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Body, HTTPException
+from fastapi_cache.decorator import cache
 
 from src.app.dependencies import DBDep
 from src.schemas.categories import CategoriesAdd, CategoriesPatch
@@ -14,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех категорий")
+@cache(expire=3600)
 async def get_categories(db: DBDep):
     try:
         return await db.categories.get_all()
@@ -22,6 +24,7 @@ async def get_categories(db: DBDep):
 
 
 @router.get("/{category_id}", name="Получение одной категории")
+@cache(expire=3600)
 async def get_category(category_id: int, db: DBDep):
     try:
         return await db.categories.get_one_ore_none(id=category_id)

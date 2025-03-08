@@ -1,9 +1,11 @@
 import logging
 
 from fastapi import APIRouter, Body, HTTPException
+from fastapi_cache.decorator import cache
 
 from src.app.dependencies import DBDep
 from src.schemas.managers import ManagersAdd, ManagersPatch
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -14,6 +16,7 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех менеджеров")
+@cache(expire=3600)
 async def get_managers(db: DBDep):
     try:
         return await db.managers.get_all()
@@ -22,6 +25,7 @@ async def get_managers(db: DBDep):
 
 
 @router.get("/{manager_id}", name="Получение одного менеджера")
+@cache(expire=3600)
 async def get_manager(manager_id: int, db: DBDep):
     try:
         return await db.managers.get_one_ore_none(id=manager_id)

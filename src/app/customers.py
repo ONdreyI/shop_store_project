@@ -14,9 +14,16 @@ router = APIRouter(
 
 
 @router.get("", name="Получение всех клиентов")
-async def get_customers(db: DBDep):
+async def get_customers(
+    db: DBDep,
+    page: int = 1,
+    per_page: int = 10,
+):
     try:
-        return await db.customers.get_all()
+        return await db.customers.get_all_with_pagination(
+            page=page,
+            per_page=per_page,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

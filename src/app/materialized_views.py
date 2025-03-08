@@ -1,8 +1,8 @@
 import logging
 
 from fastapi import APIRouter
+from fastapi_cache.decorator import cache
 
-from src.schemas.views.monthly_order_summary import MonthlyOrderSummaryRead
 from src.app.dependencies import DBDep
 
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +13,8 @@ router = APIRouter(
 )
 
 
-@router.post("/refresh-monthly-order-summary", description="Анализ заказов по месяцам")
+@router.get("/refresh-monthly-order-summary", description="Анализ заказов по месяцам")
+@cache(expire=100)
 async def refresh_monthly_order_summary_route(db: DBDep):
     data = await db.monthly_order_summary.refresh_monthly_order_summary()
     return {"status": "OK", "data": [data]}
