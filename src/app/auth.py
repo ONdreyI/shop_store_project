@@ -3,12 +3,10 @@ import logging
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import ValidationError
 
-from app.dependencies import UserIdDep, DBDep
+from src.app.dependencies import UserIdDep, DBDep
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
 from src.services.auth import AuthService
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from src.logging_config import logger
 
 router = APIRouter(
     prefix="/auth",
