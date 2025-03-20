@@ -1,5 +1,4 @@
 from decimal import Decimal
-
 import sqlalchemy as sa
 from sqlalchemy import select, func
 from sqlalchemy.orm import Mapped, mapped_column
@@ -22,14 +21,26 @@ class MonthlyOrderSummaryORM(Base):
     total_order_value: Mapped[Decimal] = mapped_column(sa.DECIMAL)
 
 
-monthly_order_summary = materialized_view(
-    "monthly_order_summary",
-    select(
-        func.extract("year", OrdersORM.order_date).label("order_year"),
-        func.extract("month", OrdersORM.order_date).label("order_month"),
-        func.count(OrdersORM.id).label("order_count"),
-        func.sum(OrdersORM.total_price).label("total_order_value"),
-    ).group_by(
-        "order_year", "order_month"
-    ),  # Оставляем один раз
+# Создание материализованного представления с использованием чистого SQL
+# для обеспечения правильного определения первичного ключа.
+monthly_order_summary = sa.DDL(
+    """
+    CREATE MATERIALIZED VIEW IF NOT EXISTS monthly_order_summary AS
+    SELECT 
+        EXTRACT(YEAR FROM order_date)::integer as order_year,
+        EXTRACT(MONTH FROM order_date)::integer as order_month,
+        COUNT(id) as order_count,
+        SUM(total_price) as total_order_value
+    FROM orders
+    GROUP BY 
+        EXTRACT(YEAR FROM order_date),
+        EXTRACT(MONTH FROM order_date)
+    WITH DATA;
+"""
+)
+
+sa.event.listen(
+    Base.metadata,
+    "after_create",
+    monthly_order_summary.execute_if(dialect="postgresql"),
 )

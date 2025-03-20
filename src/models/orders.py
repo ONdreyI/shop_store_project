@@ -40,20 +40,12 @@ class OrdersORM(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    order_date: Mapped[Date] = mapped_column(Date, index=True, nullable=False)
-    customer_id: Mapped[int] = mapped_column(
-        ForeignKey("customers.id"), index=True, nullable=False
-    )
-    manager_id: Mapped[int] = mapped_column(
-        ForeignKey("managers.id"), index=True, nullable=False
-    )
-    region_id: Mapped[int] = mapped_column(
-        ForeignKey("regions.id"), index=True, nullable=False
-    )
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"), index=True, nullable=False
-    )
-    total_price: Mapped[DECIMAL] = mapped_column(DECIMAL, index=True, nullable=True)
+    order_date: Mapped[Date] = mapped_column(Date, nullable=False)
+    customer_id: Mapped[int] = mapped_column(ForeignKey("customers.id"), nullable=False)
+    manager_id: Mapped[int] = mapped_column(ForeignKey("managers.id"), nullable=False)
+    region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    total_price: Mapped[DECIMAL] = mapped_column(DECIMAL, nullable=True)
 
     customer: Mapped["CustomersORM"] = relationship("CustomersORM")
     manager: Mapped["ManagersORM"] = relationship("ManagersORM")

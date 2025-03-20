@@ -28,22 +28,42 @@ def _refresh_materialized_view(element, compiler, **kw):
     return "REFRESH MATERIALIZED VIEW %s" % (element.name)
 
 
-def materialized_view(name, selectable):
+def materialized_view(name, selectable, indexes=None):
     """
     Создаёт объект материализованного представления в SQLAlchemy,
     используя основную метадату (Base.metadata).
+
+    Args:
+        name: имя материализованного представления
+        selectable: SQL-запрос для представления
+        indexes: список индексов для материализованного представления
     """
     view_table = sa.Table(
         name,
-        sa.MetaData(),  # Убрал `metadata`, чтобы не зависеть от глобального объекта
+        Base.metadata,
         *[sa.Column(c.name, c.type) for c in selectable.selected_columns],
         extend_existing=True,
     )
+
+    # Создание представления
     sa.event.listen(
         Base.metadata,
         "after_create",
         CreateMaterializedView(name, selectable).execute_if(dialect="postgresql"),
     )
+
+    # Создание индексов, если они указаны
+    if indexes:
+        for idx in indexes:
+            sa.event.listen(
+                Base.metadata,
+                "after_create",
+                sa.DDL(f"CREATE INDEX ON {name} {idx}").execute_if(
+                    dialect="postgresql"
+                ),
+            )
+
+    # Удаление представления
     sa.event.listen(
         Base.metadata,
         "before_drop",
@@ -51,4 +71,5 @@ def materialized_view(name, selectable):
             dialect="postgresql"
         ),
     )
+
     return view_table
