@@ -1,12 +1,8 @@
-import logging
-
 from fastapi import APIRouter
 from fastapi_cache.decorator import cache
 
 from src.app.dependencies import DBDep
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 router = APIRouter(
     prefix="/materialized_views",
     tags=["Анализ данных"],
