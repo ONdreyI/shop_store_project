@@ -1,11 +1,8 @@
 from decimal import Decimal
 import sqlalchemy as sa
-from sqlalchemy import select, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.models.orders import OrdersORM
 from src.database import Base
-from src.utils.materialized_views import materialized_view
 
 
 class MonthlyOrderSummaryORM(Base):

@@ -1,5 +1,3 @@
-import logging
-
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import ValidationError
 

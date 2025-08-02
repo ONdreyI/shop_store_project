@@ -1,6 +1,6 @@
 import functools
 import json
-from typing import Callable, Type
+from typing import Callable
 
 from src.connectors.redis_connector import RedisManager
 from src.config import settings

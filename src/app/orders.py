@@ -4,7 +4,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Body, Query
 from fastapi_cache.decorator import cache
 from src.app.dependencies import DBDep, UserIdDep
-from src.schemas.orders import Orders, OrdersAdd, OrdersAddRequest, OrderUpdate
+from src.schemas.orders import OrdersAdd, OrdersAddRequest, OrderUpdate
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,8 +18,10 @@ router = APIRouter(
 @cache(expire=3600)
 async def get_orders(
     db: DBDep,
-    start_date: date | None = Query(None, example="2023-01-01"),
-    end_date: date | None = Query(None, example="2023-01-01"),
+    start_date: date | None = Query(
+        None, examples={"example1": {"value": "2023-01-01"}}
+    ),
+    end_date: date | None = Query(None, examples={"example1": {"value": "2023-01-01"}}),
     page: int = 1,
     per_page: int = 10,
 ):

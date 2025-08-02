@@ -13,7 +13,7 @@ async_session_maker = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,
 )
-async_session_maker_null_pool = async_session_maker(
+async_session_maker_null_pool = async_sessionmaker(
     bind=engine_null_pool,
     expire_on_commit=False,
 )

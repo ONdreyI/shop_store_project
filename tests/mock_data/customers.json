@@ -1,0 +1,26 @@
+[
+  {
+    "first_name": "Иван",
+    "last_name": "Петров",
+    "email": "ivan@example.com",
+    "phone": "+7 900 1234567",
+    "address": "г. Москва, ул. Ленина, д. 10, кв. 5",
+    "birth_date": "1985-03-15"
+  },
+  {
+    "first_name": "Мария",
+    "last_name": "Сидорова",
+    "email": "maria@example.com",
+    "phone": "+7 900 7654321",
+    "address": "г. Санкт-Петербург, пр. Невский, д. 20, кв. 15",
+    "birth_date": "1990-07-22"
+  },
+  {
+    "first_name": "Алексей",
+    "last_name": "Иванов",
+    "email": "alexey@example.com",
+    "phone": "+7 911 5557777",
+    "address": "г. Казань, ул. Баумана, д. 5, кв. 12",
+    "birth_date": "1982-11-30"
+  }
+]

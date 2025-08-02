@@ -1,0 +1,14 @@
+[
+    {
+      "name": "user",
+      "permissions": "basic_access"
+    },
+    {
+      "name": "manager",
+      "permissions": "order_management,customer_management"
+    },
+    {
+      "name": "admin",
+      "permissions": "full_access"
+    }
+  ]

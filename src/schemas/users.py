@@ -1,7 +1,6 @@
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from pydantic import BaseModel, ConfigDict, constr, Field, EmailStr, conint
-from pydantic.v1 import validator
 
 
 class UserRequestAdd(BaseModel):

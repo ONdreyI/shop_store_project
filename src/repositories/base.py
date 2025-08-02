@@ -1,5 +1,6 @@
 from datetime import date
 from pydantic import BaseModel
+from typing import Sequence
 from sqlalchemy import select, delete, insert, update, and_
 from src.database import async_session_maker
 from src.repositories.mappers.base import DataMapper
@@ -105,6 +106,10 @@ class BaseRepository:
         result = await self.session.execute(add_data_stmt)
         model = result.scalars().one()
         return self.mapper.map_to_domain_entity(model)
+
+    async def add_bulk(self, data: Sequence[BaseModel]):
+        add_data_stmt = insert(self.model).values([item.model_dump() for item in data])
+        await self.session.execute(add_data_stmt)
 
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by):
         update_stmt = (

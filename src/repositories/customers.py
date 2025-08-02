@@ -6,3 +6,4 @@ from src.repositories.mappers.mappers import CustomersMapper
 class CustomersRepository(BaseRepository):
     model = CustomersORM
     mapper = CustomersMapper
+

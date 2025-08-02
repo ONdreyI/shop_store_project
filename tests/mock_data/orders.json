@@ -1,0 +1,26 @@
+[
+  {
+    "order_date": "2023-01-15",
+    "customer_id": 1,
+    "manager_id": 1,
+    "region_id": 1,
+    "user_id": 1,
+    "total_price": 18500.00
+  },
+  {
+    "order_date": "2023-02-20",
+    "customer_id": 2,
+    "manager_id": 2,
+    "region_id": 2,
+    "user_id": 1,
+    "total_price": 39000.00
+  },
+  {
+    "order_date": "2023-03-10",
+    "customer_id": 3,
+    "manager_id": 3,
+    "region_id": 3,
+    "user_id": 1,
+    "total_price": 15800.00
+  }
+]

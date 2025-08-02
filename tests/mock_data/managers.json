@@ -1,0 +1,17 @@
+[
+  {
+    "first_name": "Дмитрий",
+    "last_name": "Смирнов",
+    "department": "Продажи"
+  },
+  {
+    "first_name": "Елена",
+    "last_name": "Козлова",
+    "department": "Обслуживание клиентов"
+  },
+  {
+    "first_name": "Сергей",
+    "last_name": "Николаев",
+    "department": "Логистика"
+  }
+]
