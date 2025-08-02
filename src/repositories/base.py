@@ -1,4 +1,6 @@
 from datetime import date
+from typing import Sequence
+
 from pydantic import BaseModel
 from typing import Sequence
 from sqlalchemy import select, delete, insert, update, and_

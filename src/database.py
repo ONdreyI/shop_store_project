@@ -14,8 +14,12 @@ async_session_maker = async_sessionmaker(
     expire_on_commit=False,
 )
 async_session_maker_null_pool = async_sessionmaker(
+<<<<<<< HEAD
     bind=engine_null_pool,
     expire_on_commit=False,
+=======
+    bind=engine_null_pool, expire_on_commit=False
+>>>>>>> 42d8a6137fd0e22eef098d5eabd90c6a81366444
 )
 
 

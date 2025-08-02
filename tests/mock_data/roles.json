@@ -1,4 +1,5 @@
 [
+<<<<<<< HEAD
     {
       "name": "user",
       "permissions": "basic_access"
@@ -12,3 +13,18 @@
       "permissions": "full_access"
     }
   ]
+=======
+  {
+    "name": "user",
+    "permissions": "basic_access"
+  },
+  {
+    "name": "manager",
+    "permissions": "order_management,customer_management"
+  },
+  {
+    "name": "admin",
+    "permissions": "full_access"
+  }
+]
+>>>>>>> 42d8a6137fd0e22eef098d5eabd90c6a81366444
